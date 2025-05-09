@@ -1,11 +1,13 @@
+using System.Security.AccessControl;
+
 namespace TBRapp2;
 
 public class ListManager
 {
-     public ListManager()
+    public ListManager()
     {
 #if DEBUG
-        Books.AddRange(new List<Book>
+        TBR_Books.AddRange(new List<Book>
         {
             new Book
             {
@@ -22,7 +24,9 @@ public class ListManager
                 Title = "Test Book 3", Author = "Author C", YearPublished = 2020, Pages = 220, Country = "Canada",
                 Subject = "Murder", Vibe = "Scary", Source = "Recommended"
             },
-                new Book { Title = "The Cosmic Drift", Author = "Ada Holt", YearPublished = 1998, Pages = 310,
+            new Book
+            {
+                Title = "The Cosmic Drift", Author = "Ada Holt", YearPublished = 1998, Pages = 310,
                 Country = "USA", Subject = "Outer Space", Vibe = "Thoughtful", Source = "Cool Cover"
             },
             new Book
@@ -122,9 +126,10 @@ public class ListManager
             }
         });
 #endif
-        }
+    }
 
-    public List<Book> Books { get; set; } = new List<Book>();
+    public List<Book> TBR_Books { get; set; } = new List<Book>();
+    public List<Book> ReadBooks { get; set; } = new List<Book>();
 
     private Dictionary<string, int>
         subjectCounts =
@@ -146,7 +151,7 @@ public class ListManager
 
     public void AddBook(Book book)
     {
-        Books.Add(book);
+        TBR_Books.Add(book);
         IncrementCount(subjectCounts, book.Subject);
         IncrementCount(vibeCounts, book.Vibe);
     }
@@ -184,6 +189,52 @@ public class ListManager
             Vibe = vibe,
             Source = discovered
         };
+    }
+
+    public void AddReadBook(Book book) //meant to take book from TBR_Pile to ReadPile, provide date, let the user change
+        //vibe if they feel differently after reading the book, and provide a recommendation for other readers
+    {
+        do
+        {
+            if (!string.IsNullOrWhiteSpace(book.Title))
+            {
+                book.Title = book.Title;
+            }
+            else 
+            {
+                Console.WriteLine("Title cannot be empty, try again.");
+            }
+        } while (book.Title == null);
+
+        book.IsRead = true;
+        book.DateFinished = DateOnly.FromDateTime(DateTime.Now);
+        ReadBooks.Add(book);
+
+        if (TBR_Books.Contains(book))
+        {
+            TBR_Books.Remove(book);
+        }
+
+        Console.WriteLine("\nDo you want to update the vibe? yes/no");
+        var vibeUpdate = Console.ReadLine();
+        if (vibeUpdate.ToLower() == "yes" || vibeUpdate.ToLower() == "y")
+        {
+            Console.WriteLine("\nEnter the book's Vibe: ");
+            book.Vibe = Console.ReadLine();
+        }
+
+        Console.WriteLine("Did you like this book enough to recommend it? yes/no");
+        var recommend = Console.ReadLine();
+        if (recommend.ToLower() == "yes" || recommend.ToLower() == "y")
+        {
+            Console.WriteLine("\nName an author or book that you would use as a recommendation for this book: ");
+            var comparable = Console.ReadLine();
+            book.Comparable = $"Would recommend this book if you like {comparable}";
+        }
+        else
+        {
+            book.Comparable = "I would not recommend this book";
+        }
     }
 
     //this method checks to see if a user addition already exists and either increases the count or adds the input

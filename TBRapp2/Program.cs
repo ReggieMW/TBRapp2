@@ -1,4 +1,9 @@
-﻿namespace TBRapp2;
+﻿using System.ComponentModel;
+
+namespace TBRapp2;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 class Program
 {
@@ -6,15 +11,18 @@ class Program
     {
         ListManager manager = new ListManager();
         bool running = true;
+        Book readBook = null;
 
         while (running)
         {
             Console.WriteLine("Your TBR Pile");
-            Console.WriteLine("1. Show Current Pile");
+            Console.WriteLine("1. Show Current TBR Pile");
             Console.WriteLine("2. Sort Pile");
             Console.WriteLine("3. Filter Pile");
-            Console.WriteLine("4. Add a Book to the Pile");
-            Console.WriteLine("5. Exit");
+            Console.WriteLine("4. Add a Book to the TBR Pile");
+            Console.WriteLine("5. Mark a book as finished!");
+            Console.WriteLine("6. See Read Books pile");
+            Console.WriteLine("7. Exit");
             Console.WriteLine("Please select an option: ");
 
             var menuSelection = Console.ReadLine();
@@ -22,13 +30,13 @@ class Program
             switch (menuSelection)
             {
                 case "1":
-                    if (manager.Books.Count == 0)
+                    if (manager.TBR_Books.Count == 0)
                     {
                         Console.WriteLine("There are no books in your book pile yet.");
                     }
                     else
                     {
-                        foreach (var book in manager.Books)
+                        foreach (var book in manager.TBR_Books)
                         {
                             Console.WriteLine($"- {book.Title} by {book.Author} ({book.Pages} pages)");
                         }
@@ -49,42 +57,42 @@ class Program
                     switch (sortSelection)
                     {
                         case "1":
-                            var authorAZ = manager.Books.OrderBy(b => GetLastName(b.Author)).ToList();
+                            var authorAZ = manager.TBR_Books.OrderBy(b => GetLastName(b.Author)).ToList();
                             foreach (var book in authorAZ)
                             {
                                 Console.WriteLine($"{book.Title} by {book.Author} ({book.Pages} pages)");   
                             }
                             break;
                         case "2":
-                            var authorZA = manager.Books.OrderByDescending(b => GetLastName(b.Author)).ToList();
+                            var authorZA = manager.TBR_Books.OrderByDescending(b => GetLastName(b.Author)).ToList();
                             foreach (var book in authorZA)
                             {
                                 Console.WriteLine($"{book.Title} by {book.Author} ({book.Pages} pages)");
                             }
                             break;
                         case "3":
-                            var titleAZ = manager.Books.OrderBy(b => b.Title).ToList();
+                            var titleAZ = manager.TBR_Books.OrderBy(b => b.Title).ToList();
                             foreach (var book in titleAZ)
                             {
                                 Console.WriteLine($"{book.Title} by {book.Author} ({book.Pages} pages)");
                             }
                             break;
                         case "4":
-                            var titleZA = manager.Books.OrderByDescending(b => b.Title).ToList();
+                            var titleZA = manager.TBR_Books.OrderByDescending(b => b.Title).ToList();
                             foreach (var book in titleZA)
                             {
                                 Console.WriteLine($"{book.Title} by {book.Author} ({book.Pages} pages)");
                             }
                             break;
                         case "5":
-                            var pagesAscending = manager.Books.OrderBy(b => (b.Pages));
+                            var pagesAscending = manager.TBR_Books.OrderBy(b => (b.Pages));
                             foreach (var book in pagesAscending)
                             {
                                 Console.WriteLine($"{book.Title} by {book.Author} ({book.Pages} pages)");
                             }
                             break;
                         case "6":
-                            var pagesDescending = manager.Books.OrderByDescending(b => (b.Pages));
+                            var pagesDescending = manager.TBR_Books.OrderByDescending(b => (b.Pages));
                             foreach (var book in pagesDescending)
                             {
                                 Console.WriteLine($"{book.Title} by {book.Author} ({book.Pages} pages)");
@@ -106,6 +114,47 @@ class Program
                     Console.WriteLine($"\nAdded \"{newBook.Title}\" to your TBR Pile!");
                     break;
                 case "5":
+                    Console.WriteLine("\nEnter the book's Title: ");
+                    string readTitle = Console.ReadLine();
+                    readBook = manager.TBR_Books.FirstOrDefault(b => b.Title.Equals(readTitle, StringComparison.OrdinalIgnoreCase));
+                    if (manager.TBR_Books.Contains(readBook))
+                    {
+                        if (readBook != null)
+                        {
+                            manager.AddReadBook(readBook);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nThis book is not in your TBR pile. Would you still like to add it to your read pile? yes/no");
+                        {
+                            var stillAdd = Console.ReadLine();
+                            if (stillAdd.ToLower() == "yes" || stillAdd.ToLower() == "y")
+                            {
+                                readBook = manager.CreateBook();
+                                manager.AddReadBook(readBook);
+                            }
+                            else
+                            {
+                                Console.WriteLine("No problem, back to the menu");
+                                break; 
+                            }
+                        }
+                    }
+                    break;
+                case "6":
+                    if (manager.ReadBooks.Count == 0)
+                    {
+                        Console.WriteLine("There are no books in your book pile yet.");
+                    }
+                    else
+                    {
+                        foreach (var book in manager.ReadBooks)
+                        {
+                            Console.WriteLine($"- {book.Title} by {book.Author} {book.DateFinished}. {book.Vibe}. {book.Comparable}.");
+                        }
+                    } break;
+                case "7":
                     Console.WriteLine("Thank you for using the TBR List!");
                     running = false;
                     break;
@@ -158,7 +207,7 @@ class Program
                     return;
             }
 
-            var options = manager.Books
+            var options = manager.TBR_Books
                 .Select(propertySelector)
                 .Where(x => !string.IsNullOrWhiteSpace(x))
                 .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -181,7 +230,7 @@ class Program
             if (int.TryParse(Console.ReadLine(), out int selected) && selected >= 1 && selected <= options.Count)
             {
                 string selectedOption = options[selected - 1];
-                var filteredBooks = manager.Books
+                var filteredBooks = manager.TBR_Books
                     .Where(b => propertySelector(b).Equals(selectedOption, StringComparison.OrdinalIgnoreCase))
                     .ToList();
 

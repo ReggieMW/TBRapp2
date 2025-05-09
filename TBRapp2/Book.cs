@@ -13,4 +13,13 @@ public class Book
     public string Subject { get; set; }
     public string Vibe { get; set; }
     public string Source { get; set; }
+    
+    //new properties once a book has been read by the user
+    public bool IsRead { get; set; }
+    
+    public DateOnly DateFinished { get; set; }
+
+    public string Comparable { get; set; }
+    
+    
 }
