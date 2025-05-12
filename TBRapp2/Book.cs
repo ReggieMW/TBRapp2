@@ -20,6 +20,7 @@ public class Book
     public DateOnly DateFinished { get; set; }
 
     public string Comparable { get; set; }
+    public bool CanonBook { get; set; }
     
     
 }

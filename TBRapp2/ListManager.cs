@@ -130,6 +130,7 @@ public class ListManager
 
     public List<Book> TBR_Books { get; set; } = new List<Book>();
     public List<Book> ReadBooks { get; set; } = new List<Book>();
+    public List<Book> MyCanon  { get; set; } = new List<Book>();
 
     private Dictionary<string, int>
         subjectCounts =
@@ -234,6 +235,23 @@ public class ListManager
         else
         {
             book.Comparable = "I would not recommend this book";
+        }
+    }
+
+    public void AddToCanon(Book book)
+    {
+        Console.WriteLine("\nAdd book to Canon? yes/no ");
+        var addCanon = Console.ReadLine()?.Trim().ToLower();
+
+        if (addCanon == "yes" || addCanon == "y")
+        {
+            book.CanonBook = true;
+            MyCanon.Add(book);
+            Console.WriteLine($"{book.Title} added to your canon!");
+        }
+        else
+        {
+            Console.WriteLine($"{book.Title} was not added to your canon!");
         }
     }
 

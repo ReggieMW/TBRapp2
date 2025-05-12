@@ -22,7 +22,8 @@ class Program
             Console.WriteLine("4. Add a Book to the TBR Pile");
             Console.WriteLine("5. Mark a book as finished!");
             Console.WriteLine("6. See Read Books pile");
-            Console.WriteLine("7. Exit");
+            Console.WriteLine("7. See my Canon");
+            Console.WriteLine("8. Exit");
             Console.WriteLine("Please select an option: ");
 
             var menuSelection = Console.ReadLine();
@@ -155,6 +156,56 @@ class Program
                         }
                     } break;
                 case "7":
+                    if (manager.MyCanon.Count == 0)
+                    {
+                        Console.WriteLine("There are no books in your canon yet. Would you like to add a book to your canon? yes/no");
+                        var userAnswer = Console.ReadLine().Trim();
+                        if (userAnswer.ToLower() == "yes" || userAnswer.ToLower() == "y")
+                        {
+                            Console.WriteLine("\nWhich book would you like to add?");
+                            var bookName = Console.ReadLine();
+                            var bookToAdd = manager.ReadBooks.FirstOrDefault(b => b.Title.Equals(bookName, StringComparison.OrdinalIgnoreCase));
+
+                            if (bookToAdd != null)
+                            {
+                                manager.AddToCanon(bookToAdd);
+                                Console.WriteLine($"\nAdded \"{bookToAdd.Title}\" to your canon!");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Book not found. Make sure book is in your Read Pile before adding to canon.");
+                            }
+                        }
+                    }
+
+                    if (manager.MyCanon.Count > 0)
+                    {
+                        foreach (var book in manager.MyCanon)
+                        {
+                            Console.WriteLine($"{book.Title} by {book.Author} ({book.Pages} pages)\n");
+                        }
+                        Console.WriteLine("\nWould you like to add another book to your canon? yes/no");
+                        var userAnswer = Console.ReadLine().Trim();
+                        if (userAnswer.ToLower() == "yes" || userAnswer.ToLower() == "y")
+                        {
+                            Console.WriteLine("\nWhich book would you like to add?");
+                            var bookName = Console.ReadLine();
+                            var bookToAdd = manager.ReadBooks.FirstOrDefault(b => b.Title.Equals(bookName, StringComparison.OrdinalIgnoreCase));
+
+                            if (bookToAdd != null)
+                            {
+                                manager.AddToCanon(bookToAdd);
+                                Console.WriteLine($"\nAdded \"{bookToAdd.Title}\" to your canon!");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Book not found. Make sure book is in your Read Pile before adding to canon.");
+                            }
+                        }
+                    }
+
+                    break;
+                case "8":
                     Console.WriteLine("Thank you for using the TBR List!");
                     running = false;
                     break;
